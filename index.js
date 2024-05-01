@@ -4,11 +4,14 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 require('dotenv').config();
+const { BigQuery } = require('@google-cloud/bigquery');
+const { Firestore } = require('@google-cloud/firestore');
 
 // Initialize Express app
 const app = express();
 
-
+// Initialize BigQuery client
+const bigquery = new BigQuery();
 // Initialize Firestore
 // Access environment variables
 const serviceAccount = {
@@ -24,19 +27,6 @@ const serviceAccount = {
     "client_x509_cert_url": process.env.CLIENT_X509_CERT_URL,
     "universe_domain": process.env.UNIVERSE_DOMAIN
 };
-// const serviceAccount = {
-//     "type": "service_account",
-//     "project_id": "sp24-41200-fbarotay-scratch",
-//     "private_key_id": "285d6abde68c1526344290910eae334d9e04d743",
-//     "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDB7LHsTeH2LfhL\nLDtOia2ysb0TSxrN9slPsUCOtgvbsaKNdvAfUAGVCqoZe9CayzAWE3UpoCkMjW+l\nF7vq56qlOQ63sFFmSMFH/B+Ko+ouY7ihYqpYoVozUZJU07GLepISay9ZwRmIdT9r\nV1guSIPCKYr8bPKlQUHxD2LiiFdyvoG89WsA6A6ewqoJx/BMOIH8prf/GpiswygE\nxSiA+Xkk97oSPE86Vi9e6pYetJjXlT4VyzWJxqtTEoham580KoSNCVoBVlARGCwE\nw8rDUnZoNGFLpBHt2HLB1wejt/yJhRJ6v2xo6ZEOW9JCqhkzKzNQX5UKQvtLYras\nszWPWXp3AgMBAAECggEAA6hlwUX7ORORN1N1Qd3S15qABMJay/jofB6XoKpUY6rS\n+xmxsbB0D5uR8Nltz2U6RcIC1GvNHBkicHGKUer5sAb5Hsc704IGcFUa159M08N9\n3p6umXRtCt2ap3dE2k/4Vr33+/2t2+BgmSyDlwZtIStuD9sL6NYrRoJfhh3RMHKV\nnCai0YrgcMiujyRvYAzL/jCkDwucMLvlQNVut00xb9w3cUtnOO6JsgA92P7ANXHF\nhTZ/958XN4R96ZbxMW7ew0afQpEVnJqWR1rp5w/1AlZjuhPvzVj6iDy9Ux9E4Bj4\nYUe8wSIttsKZiDxQBOJbRaCyqnebqxxt8XsgRSbtMQKBgQD/AbW3mApshHS49k+9\nBADuLdYD6vymRMiYceGo7m1w/tK9J4DGb1CMv0yiPnyez4EN9bZkyuikNQWiQj5E\nxo153Rgpz2M7EC5htmyeMTDqeOz+0MqwyuHQPb6ifdDuB/N4H+1VE4HZ1zy2Mlqt\noZuoTp8DJXsGj/DwzC0YL1e+SQKBgQDCrhMgqdYVUSBJ0FQzWyWYT+kDOz0uGQEB\nUvZAdAOcjCvpdAuo2xgZpSJnX72QaspGHPW2z96gyRJYxnkYH8x1T2D2T8PZgGXf\n1XpkWWqiwIYkdlG0JNcHabSZ+X6NJkXIwdd1Hn7l7A5cmheVQzk1DjSzBvA2hrER\nHTLh0PZyvwKBgQCSVn/amPS6a5S0JB2EQczq4gDkBLDyFZzr5sZx9El3w7RZ+lZr\nCaw26PzoSmWnmTrdMPl3g/3XZdoS0GL9gtfjbB6Wt72hQlrrlg1lBqOkmrqeTGFU\n7UiDATvp8bu5LXTppaDD5srooRzlDaZ957T09BFKc/LSxD2nYfQq4dg/iQKBgAnf\nwmCZvJ4AK18TDfI84T9EblEXpBa+deqXRp4mRDigc2m31Q+PbT1/vqr3lCnLAM9l\nkKDhEi2dhSyzhFjQ5BHfIM/dY9WYSZJ8xWRplJsEoMkgpyw34iAiIGLe4KhQFKIG\nEuOB1HXc7y2LMz8C1df3DH04EN7zHe/8RyRk8NsJAoGAE7XkWai4XML+w5jscIKh\nTdDYGCuXQviGt/2YpDtdlpR84Au8Gs0VlLtNA3LCPAyMes3VdzXkH1dMRDZSCizJ\ngM8elfw3b6fnsDbyxQkHES7P2xIVWlKWENJC6EZfVa/7SrPwiK3kX/atYlURpgsS\n3VHQos3hpadxIabTv47jNsc=\n-----END PRIVATE KEY-----\n",
-//     "client_email": "mapaccident@sp24-41200-fbarotay-scratch.iam.gserviceaccount.com",
-//     "client_id": "104417845907998168543",
-//     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-//     "token_uri": "https://oauth2.googleapis.com/token",
-//     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-//     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/mapaccident%40sp24-41200-fbarotay-scratch.iam.gserviceaccount.com",
-//     "universe_domain": "googleapis.com"
-//   };
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
@@ -103,7 +93,7 @@ app.post('/register', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
+//API Fetch endpoint /locations
 
 
 

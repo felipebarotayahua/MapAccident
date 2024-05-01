@@ -141,4 +141,7 @@ h1 {
     background-color: #28a745; /* Green color */
     color: #fff;
 }
-
+#map {
+    height: 400px;
+    width: 100%;
+}
