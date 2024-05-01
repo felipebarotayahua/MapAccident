@@ -1,0 +1,59 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Accident</title>
+    
+    <link rel="stylesheet" href="styles.css">
+
+    <script src="scripts.js" ></script>
+
+
+</head>
+<body>
+    <!-- Navigation bar -->
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a id="loginButton" href="/login.html">Login</a></li>
+            <li><a href="/register.html">Register</a></li>
+            <li><a id="logoutButton" href="/login.html">Logout</a></li>
+            
+
+        </ul>
+    </nav>
+
+   <!-- Main content area -->
+<div class="container">
+    <h1>Welcome to Map Accident!</h1>
+    <!-- Google Map block -->
+    <div id="map"></div>
+
+    <!-- Log Accidents block -->
+    <div class="log-accidents">
+        <h2>Log Accidents/temporary?</h2>
+        <form action="#" method="post">
+            <label for="latitude">Latitude:</label><br>
+            <input type="text" id="latitude" name="latitude" required><br>
+
+            <label for="longitude">Longitude:</label><br>
+            <input type="text" id="longitude" name="longitude" required><br>
+
+            <label for="description">Description:</label><br>
+            <textarea id="description" name="description" rows="4" required></textarea><br>
+
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</div>
+
+   
+
+    
+
+
+    
+</body>
+</html>
